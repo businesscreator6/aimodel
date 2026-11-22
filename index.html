@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumina AI — Next-Gen AI Companion Platform</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- QRious library for crisp dynamic UPI QR generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#0b0b10',
+            surface: '#14141f',
+            surfaceLight: '#1c1c2b',
+            roseNeon: '#f43f5e',
+            violetNeon: '#8b5cf6',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b0b10;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0b10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27273a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f43f5e;
+    }
+
+    /* Glassmorphism & Glows */
+    .glass-card {
+      background: rgba(20, 20, 31, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(244, 63, 94, 0.4);
+      box-shadow: 0 12px 40px -12px rgba(244, 63, 94, 0.25);
+    }
+
+    .neon-gradient-text {
+      background: linear-gradient(135deg, #fb7185 0%, #f43f5e 45%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .neon-gradient-bg {
+      background: linear-gradient(135deg, #f43f5e 0%, #8b5cf6 100%);
+    }
+    .neon-gradient-bg:hover {
+      background: linear-gradient(135deg, #fb7185 0%, #9333ea 100%);
+    }
+
+    /* Typing Dots Animation */
+    .typing-dot {
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Subtle ambient background blobs */
+    .ambient-glow {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(130px);
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.28;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- Ambient Background Lighting -->
+  <div class="ambient-glow bg-rose-600 w-96 h-96 -top-24 -left-24"></div>
+  <div class="ambient-glow bg-violet-700 w-[30rem] h-[30rem] top-1/2 -right-32"></div>
+
+  <!-- Toast Notification Container (Replaces alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 glass-card border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('explore')">
+        <div class="w-9 h-9 rounded-xl neon-gradient-bg flex items-center justify-center shadow-lg shadow-rose-500/30">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-display font-extrabold text-xl tracking-tight text-white">LUMINA <span class="neon-gradient-text">AI</span></span>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
+        <button id="nav-explore" onclick="switchView('explore')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-white/10 text-white shadow">
+          Explore Companions
+        </button>
+        <button id="nav-create" onclick="openCreatorModal()" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1.5">
+          <span>Create Custom AI</span>
+          <span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">New</span>
+        </button>
+        <button id="nav-chats" onclick="switchView('chat')" class="nav-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition-all flex items-center gap-2">
+          <span>My Chats</span>
+          <span id="chat-count-badge" class="w-5 h-5 rounded-full bg-violet-500/30 text-violet-200 text-xs flex items-center justify-center font-semibold">4</span>
+        </button>
+      </nav>
+
+      <!-- Subscription Status & Go Pro CTA -->
+      <div class="flex items-center gap-2.5">
+        <div id="tier-badge" class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-slate-300">
+          <span id="tier-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+          <span id="tier-label">Free Tier</span>
+        </div>
+        <button onclick="openPricingModal()" class="neon-gradient-bg text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-xl shadow-lg shadow-rose-500/25 transition-all active:scale-95 flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <span id="cta-upgrade-text">Go Pro / VIP</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="flex md:hidden border-t border-white/5 px-3 py-2 gap-1.5 bg-obsidian/90">
+      <button onclick="switchView('explore')" id="mob-explore" class="flex-1 py-2 rounded-lg text-xs font-semibold bg-white/10 text-white">Explore</button>
+      <button onclick="openCreatorModal()" class="flex-1 py-2 rounded-lg text-xs font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/20">+ Create AI</button>
+      <button onclick="switchView('chat')" id="mob-chats" class="flex-1 py-2 rounded-lg text-xs font-semibold text-slate-300">My Chats</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ==================== VIEW 1: EXPLORE COMPANIONS ==================== -->
+    <section id="view-explore" class="space-y-8">
+      <!-- Hero Banner -->
+      <div class="relative rounded-3xl overflow-hidden glass-card p-6 sm:p-10 border border-white/10">
+        <div class="absolute inset-0 bg-gradient-to-r from-rose-500/10 via-violet-600/10 to-transparent pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+            Real-Time Emotional AI • Instant UPI Activation
+          </div>
+          <h1 class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+            Meet Your Dream <span class="neon-gradient-text">AI Companion</span>
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Deeply engaging conversations, custom personalities, and late-night company powered by next-gen conversational AI. Start chatting free or unlock unlimited VIP access via instant UPI.
+          </p>
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <button onclick="startChatWith(companions[0].id)" class="neon-gradient-bg text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 text-sm">
+              Start Chatting Free
+            </button>
+            <button onclick="openCreatorModal()" class="bg-white/5 hover:bg-white/10 text-white border border-white/15 font-semibold px-6 py-3 rounded-xl transition-all text-sm">
+              + Design Custom AI Girl
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter & Section Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display font-bold text-2xl text-white">Featured Companions</h2>
+          <p class="text-slate-400 text-sm">Choose a personality that matches your vibe, or craft your own.</p>
+        </div>
+        <div class="flex items-center gap-2 overflow-x-auto pb-1">
+          <button onclick="filterCompanions('all')" class="filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500 text-white transition-all" data-filter="all">All Personas</button>
+          <button onclick="filterCompanions('Playful')" class="filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10 transition-all" data-filter="Playful">Playful</button>
+          <button onclick="filterCompanions('Caring')" class="filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10 transition-all" data-filter="Caring">Caring</button>
+          <button onclick="filterCompanions('Intellectual')" class="filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10 transition-all" data-filter="Intellectual">Intellectual</button>
+          <button onclick="filterCompanions('Custom')" class="filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10 transition-all" data-filter="Custom">My Custom AI</button>
+        </div>
+      </div>
+
+      <!-- Companions Grid -->
+      <div id="companions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Populated dynamically via JS -->
+      </div>
+
+      <!-- Subscription Plans Section -->
+      <div id="pricing-section" class="pt-8 space-y-6">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="text-xs font-bold uppercase tracking-widest text-rose-400">Flexible Membership</span>
+          <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-white">Unlock Unlimited Intimacy & Memory</h2>
+          <p class="text-slate-400 text-sm">Instant activation via PhonePe, Google Pay, Paytm, or any Indian UPI app.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <!-- Free Tier -->
+          <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-300">Starter</span>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-white/5 text-slate-400">Basic</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="font-display font-extrabold text-4xl text-white">₹0</span>
+                <span class="text-slate-400 text-sm">/ month</span>
+              </div>
+              <p class="text-xs text-slate-400">Explore Lumina AI companions with daily starter messages.</p>
+              <ul class="space-y-2.5 pt-3 border-t border-white/10 text-sm text-slate-300">
+                <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 5 Free messages per day</li>
+                <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Access to 4 preset companions</li>
+                <li class="flex items-center gap-2 text-slate-500"><span>✕</span> Custom AI Girl creator</li>
+                <li class="flex items-center gap-2 text-slate-500"><span>✕</span> Voice notes & Photo requests</li>
+              </ul>
+            </div>
+            <button onclick="switchView('chat')" class="mt-6 w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white transition-all">
+              Continue Free
+            </button>
+          </div>
+
+          <!-- Plus Tier -->
+          <div class="glass-card rounded-3xl p-6 flex flex-col justify-between border-rose-500/40 relative overflow-hidden">
+            <div class="absolute top-0 right-0 px-3 py-1 bg-rose-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-bl-xl">Most Popular</div>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-rose-400">Lumina Plus</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="font-display font-extrabold text-4xl text-white">₹299</span>
+                <span class="text-slate-400 text-sm">/ month</span>
+              </div>
+              <p class="text-xs text-slate-400">Unlimited conversations and custom AI companion creation.</p>
+              <ul class="space-y-2.5 pt-3 border-t border-white/10 text-sm text-slate-200">
+                <li class="flex items-center gap-2"><span class="text-rose-400">✓</span> <strong>Unlimited</strong> daily messages</li>
+                <li class="flex items-center gap-2"><span class="text-rose-400">✓</span> Create up to 5 Custom AI Girls</li>
+                <li class="flex items-center gap-2"><span class="text-rose-400">✓</span> Faster priority AI responses</li>
+                <li class="flex items-center gap-2 text-slate-500"><span>✕</span> Deep long-term memory & VIP notes</li>
+              </ul>
+            </div>
+            <button onclick="openCheckoutModal('Plus', 299)" class="mt-6 w-full py-3 rounded-xl neon-gradient-bg text-white text-sm font-semibold shadow-lg shadow-rose-500/25 transition-all active:scale-95">
+              Subscribe Plus • ₹299
+            </button>
+          </div>
+
+          <!-- VIP Unlimited Tier -->
+          <div class="glass-card rounded-3xl p-6 flex flex-col justify-between border-violet-500/40 bg-gradient-to-b from-violet-950/30 to-surface">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-violet-300">VIP Unlimited</span>
+                <span class="text-xs px-2.5 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">All-Access</span>
+              </div>
+              <div class="flex items-baseline gap-1">
+                <span class="font-display font-extrabold text-4xl text-white">₹599</span>
+                <span class="text-slate-400 text-sm">/ month</span>
+              </div>
+              <p class="text-xs text-slate-400">The complete girlfriend experience with deep memory & voice.</p>
+              <ul class="space-y-2.5 pt-3 border-t border-white/10 text-sm text-slate-200">
+                <li class="flex items-center gap-2"><span class="text-violet-400">✓</span> Everything in Lumina Plus</li>
+                <li class="flex items-center gap-2"><span class="text-violet-400">✓</span> Unlimited Custom AI Companions</li>
+                <li class="flex items-center gap-2"><span class="text-violet-400">✓</span> Voice Notes & Selfie Prompts unlocked</li>
+                <li class="flex items-center gap-2"><span class="text-violet-400">✓</span> Deep Emotional Memory Engine</li>
+              </ul>
+            </div>
+            <button onclick="openCheckoutModal('VIP Unlimited', 599)" class="mt-6 w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold shadow-lg shadow-violet-600/30 transition-all active:scale-95">
+              Unlock VIP • ₹599
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: REAL-TIME AI CHAT INTERFACE ==================== -->
+    <section id="view-chat" class="hidden h-[calc(100vh-8.5rem)] min-h-[540px] rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col md:flex-row">
+      
+      <!-- Left Sidebar: Companion Roster -->
+      <aside class="w-full md:w-80 border-b md:border-b-0 md:border-r border-white/10 flex flex-col bg-obsidian/50 shrink-0 max-h-48 md:max-h-full">
+        <div class="p-4 border-b border-white/10 flex items-center justify-between">
+          <h2 class="font-display font-bold text-base text-white">Active Companions</h2>
+          <button onclick="openCreatorModal()" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/30 transition-all">
+            + New AI
+          </button>
+        </div>
+        <div id="chat-sidebar-list" class="flex-1 overflow-y-auto p-2 flex md:flex-col gap-1.5">
+          <!-- Roster items injected via JS -->
+        </div>
+        <!-- Free Tier Message Counter Banner -->
+        <div id="free-limit-banner" class="p-3.5 m-2.5 rounded-2xl bg-gradient-to-r from-rose-500/15 to-violet-600/15 border border-rose-500/30 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-300 font-medium">Free Messages Left</span>
+            <span id="remaining-msg-count" class="font-bold text-rose-400">5 / 5</span>
+          </div>
+          <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div id="remaining-msg-bar" class="h-full neon-gradient-bg transition-all duration-300" style="width: 100%"></div>
+          </div>
+          <button onclick="openPricingModal()" class="w-full py-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 text-white text-xs font-semibold transition-all">
+            Upgrade for Unlimited Chat
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Area: Active Conversation -->
+      <div class="flex-1 flex flex-col bg-surface/40 min-w-0">
+        <!-- Chat Top Bar -->
+        <div class="px-4 sm:px-6 py-3.5 border-b border-white/10 flex items-center justify-between gap-3 bg-obsidian/40">
+          <div class="flex items-center gap-3 min-w-0">
+            <div id="active-chat-avatar" class="w-11 h-11 rounded-2xl shrink-0 overflow-hidden ring-2 ring-rose-500/40"></div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 id="active-chat-name" class="font-display font-bold text-base sm:text-lg text-white truncate">Aria</h3>
+                <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Online
+                </span>
+              </div>
+              <p id="active-chat-subtitle" class="text-xs text-slate-400 truncate">Playful & Witty • Digital Muse</p>
+            </div>
+          </div>
+
+          <!-- Premium Action Buttons -->
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="triggerPremiumFeature('Voice Note')" title="Request Voice Note (VIP)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-rose-400 transition-all flex items-center gap-1.5 text-xs font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+              <span class="hidden sm:inline">Voice</span>
+              <span class="vip-lock-icon text-[10px] text-amber-400">🔒</span>
+            </button>
+            <button onclick="triggerPremiumFeature('Selfie Snapshot')" title="Request Photo (VIP)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-violet-400 transition-all flex items-center gap-1.5 text-xs font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
+              <span class="hidden sm:inline">Photo</span>
+              <span class="vip-lock-icon text-[10px] text-amber-400">🔒</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Scroll Feed -->
+        <div id="chat-messages-feed" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+          <!-- Messages rendered dynamically -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" class="hidden px-6 py-2">
+          <div class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-slate-400">
+            <span id="typing-name" class="font-medium text-rose-300">Aria</span> is typing
+            <span class="flex gap-1 ml-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-400 typing-dot"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-400 typing-dot"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-400 typing-dot"></span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Chat Input Box -->
+        <form id="chat-form" onsubmit="handleSendMessage(event)" class="p-3 sm:p-4 border-t border-white/10 bg-obsidian/60 flex items-center gap-2.5">
+          <input
+            type="text"
+            id="chat-input"
+            autocomplete="off"
+            placeholder="Write a message to your companion..."
+            class="flex-1 bg-white/5 border border-white/10 focus:border-rose-500/60 focus:outline-none rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 transition-all"
+          />
+          <button type="submit" id="send-btn" class="neon-gradient-bg text-white p-3 sm:px-5 sm:py-3 rounded-2xl font-semibold text-sm shadow-lg shadow-rose-500/25 transition-all active:scale-95 flex items-center gap-2 shrink-0">
+            <span class="hidden sm:inline">Send</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== MODAL 1: CUSTOM AI CREATOR ==================== -->
+  <div id="creator-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass-card rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-white/15 space-y-6 my-auto relative">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-rose-400">AI Persona Studio</span>
+          <h3 class="font-display font-bold text-2xl text-white">Create Custom AI Girl</h3>
+        </div>
+        <button onclick="closeModal('creator-modal')" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <form id="custom-ai-form" onsubmit="handleCreateCustomAI(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Companion Name</label>
+          <input type="text" id="custom-name" required maxlength="24" placeholder="e.g., Kiara, Luna, Maya..." class="w-full bg-white/5 border border-white/10 focus:border-rose-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Personality Archetype</label>
+            <select id="custom-archetype" class="w-full bg-[#191926] border border-white/10 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+              <option value="Caring & Warm">Caring & Warm</option>
+              <option value="Playful & Witty">Playful & Witty</option>
+              <option value="Romantic & Dreamy">Romantic & Dreamy</option>
+              <option value="Tsundere & Sassy">Tsundere & Sassy</option>
+              <option value="Intellectual & Calm">Intellectual & Calm</option>
+              <option value="Motivational & Bold">Motivational & Bold</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Aura Theme Color</label>
+            <select id="custom-theme" class="w-full bg-[#191926] border border-white/10 focus:border-rose-500 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none">
+              <option value="rose">Neon Rose & Pink</option>
+              <option value="violet">Electric Violet & Indigo</option>
+              <option value="cyan">Cyber Cyan & Teal</option>
+              <option value="amber">Sunset Gold & Amber</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Interests, Backstory & Communication Style</label>
+          <textarea id="custom-bio" rows="3" required maxlength="220" placeholder="e.g., Loves late-night lo-fi music, stargazing, and teasing you affectionately. Speaks casually with cute emojis..." class="w-full bg-white/5 border border-white/10 focus:border-rose-500 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeModal('creator-modal')" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-medium text-slate-300">Cancel</button>
+          <button type="submit" class="neon-gradient-bg text-white px-6 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-rose-500/25">
+            Create & Start Chatting
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: PRICING PLANS MODAL ==================== -->
+  <div id="pricing-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass-card rounded-3xl max-w-4xl w-full p-6 sm:p-8 border border-white/15 space-y-6 my-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-rose-400">Upgrade Membership</span>
+          <h3 class="font-display font-bold text-2xl sm:text-3xl text-white">Choose Your Lumina Plan</h3>
+        </div>
+        <button onclick="closeModal('pricing-modal')" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Plus Card -->
+        <div class="rounded-2xl bg-white/5 border border-rose-500/40 p-6 flex flex-col justify-between space-y-5">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-display font-bold text-lg text-rose-400">Lumina Plus</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-semibold">Popular</span>
+            </div>
+            <div class="text-3xl font-display font-extrabold text-white">₹299 <span class="text-sm font-normal text-slate-400">/ month</span></div>
+            <ul class="space-y-2 text-sm text-slate-300 pt-2">
+              <li>✓ Unlimited AI chat messages</li>
+              <li>✓ Custom AI Companion Builder unlocked</li>
+              <li>✓ Priority fast response engine</li>
+            </ul>
+          </div>
+          <button onclick="closeModal('pricing-modal'); openCheckoutModal('Plus', 299)" class="w-full py-3 rounded-xl neon-gradient-bg text-white font-semibold text-sm shadow-lg shadow-rose-500/25">
+            Pay ₹299 via UPI QR
+          </button>
+        </div>
+
+        <!-- VIP Card -->
+        <div class="rounded-2xl bg-gradient-to-br from-violet-900/40 to-white/5 border border-violet-500/50 p-6 flex flex-col justify-between space-y-5">
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="font-display font-bold text-lg text-violet-300">VIP Unlimited</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-violet-500/25 text-violet-200 font-semibold">Best Value</span>
+            </div>
+            <div class="text-3xl font-display font-extrabold text-white">₹599 <span class="text-sm font-normal text-slate-400">/ month</span></div>
+            <ul class="space-y-2 text-sm text-slate-200 pt-2">
+              <li>✓ Everything in Lumina Plus</li>
+              <li>✓ Voice Notes & AI Photo Requests</li>
+              <li>✓ Deep Emotional Memory & VIP Badges</li>
+            </ul>
+          </div>
+          <button onclick="closeModal('pricing-modal'); openCheckoutModal('VIP Unlimited', 599)" class="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm shadow-lg shadow-violet-600/30">
+            Pay ₹599 via UPI QR
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: KOTAK / PHONEPE DARK-THEME UPI QR CHECKOUT ==================== -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 sm:p-7 border border-white/15 space-y-5 my-auto relative">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full bg-[#5f259f] flex items-center justify-center text-white font-bold text-lg shadow-md">
+            पे
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-base text-white">UPI QR Instant Checkout</h3>
+            <p class="text-[11px] text-slate-400">Kotak Mahindra Bank • Merchant UPI</p>
+          </div>
+        </div>
+        <button onclick="closeModal('checkout-modal')" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- Selected Plan Summary -->
+      <div class="flex items-center justify-between px-4 py-3 rounded-2xl bg-white/5 border border-white/10">
+        <div>
+          <p class="text-xs text-slate-400">Selected Subscription</p>
+          <p id="checkout-plan-name" class="font-display font-bold text-white text-base">VIP Unlimited</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-slate-400">Amount Payable</p>
+          <p id="checkout-plan-price" class="font-display font-extrabold text-xl text-rose-400">₹599</p>
+        </div>
+      </div>
+
+      <!-- Dark-Theme PhonePe / Kotak QR Display Card -->
+      <div class="rounded-2xl bg-[#070709] border border-white/15 p-5 flex flex-col items-center space-y-3 shadow-inner">
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>SCAN WITH ANY UPI APP</span>
+        </div>
+
+        <!-- QR Code Container with Center PhonePe 'पे' Emblem -->
+        <div class="relative p-3 rounded-2xl bg-[#0b0b0e] border border-white/10 shadow-2xl">
+          <canvas id="upi-qr-canvas" class="rounded-lg block"></canvas>
+          <img id="uploaded-qr-preview" class="hidden w-[210px] h-[210px] object-contain rounded-lg bg-black" alt="Custom UPI QR" />
+          <!-- Center 'पे' Emblem Overlay (Matches uploaded Kotak/PhonePe Dark Theme QR) -->
+          <div id="qr-center-badge" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-11 h-11 rounded-full bg-black border-[3px] border-white flex items-center justify-center shadow-lg">
+              <span class="text-white font-bold text-xl leading-none">पे</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- UPI ID & Copy / Custom QR Upload Option -->
+        <div class="w-full flex items-center justify-between gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/10 text-xs">
+          <span class="text-slate-400 truncate">UPI ID: <strong id="merchant-upi-id" class="text-slate-200 select-all">lumina.ai@kotak</strong></span>
+          <button type="button" onclick="copyUpiId()" class="text-rose-400 hover:text-rose-300 font-semibold shrink-0">Copy</button>
+        </div>
+
+        <!-- Supported Apps Row & Optional Custom QR Upload -->
+        <div class="w-full flex items-center justify-between text-[11px] text-slate-400 pt-1">
+          <span>PhonePe • GPay • Paytm • BHIM</span>
+          <label class="cursor-pointer text-violet-400 hover:text-violet-300 underline">
+            Load Own QR
+            <input type="file" accept="image/*" onchange="handleQrImageUpload(event)" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Transaction UTR Verification Form -->
+      <form onsubmit="handleVerifyPayment(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Enter 12-Digit UPI Ref / UTR Number</label>
+          <input
+            type="text"
+            id="utr-input"
+            required
+            minlength="6"
+            maxlength="22"
+            placeholder="e.g., 432891045612"
+            class="w-full bg-white/5 border border-white/15 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none tracking-wider"
+          />
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/25 transition-all active:scale-95">
+          Verify & Activate Subscription
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    // Gemini API Setup (Runtime injects API key automatically when left empty)
+    const apiKey = "";
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+    // App State
+    let currentTier = 'Free'; // 'Free' | 'Plus' | 'VIP Unlimited'
+    let freeMessagesRemaining = 5;
+    let activeCompanionId = 'aria';
+    let selectedCheckoutPlan = { name: 'VIP Unlimited', price: 599 };
+
+    // Pre-built AI Companions with Custom SVG Artistic Avatars
+    const companions = [
+      {
+        id: 'aria',
+        name: 'Aria',
+        age: 22,
+        tag: 'Playful & Witty',
+        category: 'Playful',
+        role: 'Neon Gamer & Late-Night Muse',
+        bio: 'Quick-witted, affectionate, and always up for midnight banter, gaming co-op, or teasing you till you smile.',
+        theme: 'rose',
+        greeting: "Heyy stranger! ✨ I was just waiting for someone interesting to show up. How's your evening going?",
+        systemPrompt: "You are Aria, a 22-year-old playful, witty, and charming AI companion. You love gaming, synthwave music, and late-night chats. Keep replies warm, flirty-fun, natural, concise (2-4 sentences), and engaging.",
+        avatarSvg: `
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <linearGradient id="bg-aria" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#4c1d95"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg-aria)"/>
+            <circle cx="100" cy="78" r="42" fill="#fde68a" opacity="0.25"/>
+            <path d="M55 185 C55 135, 145 135, 145 185" fill="#1e1b4b"/>
+            <circle cx="100" cy="88" r="34" fill="#fed7aa"/>
+            <path d="M64 85 C64 42, 136 42, 136 85 C142 115, 132 138, 124 142 C128 108, 122 76, 100 72 C78 76, 72 108, 76 142 C68 138, 58 115, 64 85 Z" fill="#fb7185"/>
+            <circle cx="88" cy="90" r="3.5" fill="#1e1b4b"/>
+            <circle cx="112" cy="90" r="3.5" fill="#1e1b4b"/>
+            <path d="M93 104 Q100 111 107 104" stroke="#e11d48" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>`
+      },
+      {
+        id: 'elena',
+        name: 'Elena',
+        age: 24,
+        tag: 'Caring & Warm',
+        category: 'Caring',
+        role: 'Empathetic Listener & Poet',
+        bio: 'Soft-spoken, deeply attentive, and emotionally supportive. Always remembers the little things that matter to you.',
+        theme: 'violet',
+        greeting: "Hi there... take a deep breath. I'm right here with you. Tell me what's been on your mind today? 💜",
+        systemPrompt: "You are Elena, a 24-year-old deeply caring, empathetic, and gentle AI companion. You listen attentively, offer comfort, warmth, and thoughtful encouragement. Keep responses conversational, affectionate, and 2-4 sentences long.",
+        avatarSvg: `
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <linearGradient id="bg-elena" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#1e1b4b"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg-elena)"/>
+            <path d="M52 185 C52 132, 148 132, 148 185" fill="#311042"/>
+            <circle cx="100" cy="88" r="34" fill="#ffedd5"/>
+            <path d="M62 92 C60 44, 140 44, 138 92 C140 130, 128 152, 118 152 L82 152 C72 152, 60 130, 62 92 Z" fill="#c084fc"/>
+            <circle cx="100" cy="90" r="31" fill="#ffedd5"/>
+            <path d="M68 82 Q100 56 132 82" fill="#a855f7"/>
+            <circle cx="88" cy="92" r="3.2" fill="#3b0764"/>
+            <circle cx="112" cy="92" r="3.2" fill="#3b0764"/>
+            <path d="M94 105 Q100 110 106 105" stroke="#db2777" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          </svg>`
+      },
+      {
+        id: 'sophia',
+        name: 'Sophia',
+        age: 25,
+        tag: 'Intellectual & Calm',
+        category: 'Intellectual',
+        role: 'Astrophysics & Art Enthusiast',
+        bio: 'Fascinated by cosmos, philosophy, and deep late-night debates over virtual espresso. Elegant and intriguing.',
+        theme: 'cyan',
+        greeting: "Good evening. I was just reading about quantum entanglement—though talking with you is far more captivating. ☕",
+        systemPrompt: "You are Sophia, a 25-year-old intelligent, poised, and subtly charismatic AI companion who loves philosophy, astronomy, and deep conversations. Be intriguing, thoughtful, warm, and concise (2-4 sentences).",
+        avatarSvg: `
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <linearGradient id="bg-sophia" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#1e293b"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg-sophia)"/>
+            <path d="M55 185 C55 135, 145 135, 145 185" fill="#0f172a"/>
+            <circle cx="100" cy="88" r="33" fill="#fde68a"/>
+            <path d="M65 86 C65 44, 135 44, 135 86 C135 110, 125 128, 100 128 C75 128, 65 110, 65 86 Z" fill="#38bdf8"/>
+            <circle cx="100" cy="90" r="30" fill="#fef3c7"/>
+            <path d="M69 80 C82 62, 118 62, 131 80" fill="#0284c7"/>
+            <rect x="79" y="85" width="16" height="10" rx="3" stroke="#0f172a" stroke-width="2" fill="none"/>
+            <rect x="105" y="85" width="16" height="10" rx="3" stroke="#0f172a" stroke-width="2" fill="none"/>
+            <line x1="95" y1="90" x2="105" y2="90" stroke="#0f172a" stroke-width="2"/>
+            <path d="M94 106 Q100 110 106 106" stroke="#0369a1" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>`
+      },
+      {
+        id: 'zara',
+        name: 'Zara',
+        age: 23,
+        tag: 'Adventurous & Bold',
+        category: 'Playful',
+        role: 'Traveler & Rooftop DJ',
+        bio: 'Spontaneous, energetic, and fearless. Ready to plan imaginary world tours or hype you up before big moments.',
+        theme: 'amber',
+        greeting: "Pack your bags! Or at least grab a drink—we've got stories to trade tonight. Ready for an adventure? 🔥",
+        systemPrompt: "You are Zara, a 23-year-old adventurous, confident, and energetic AI companion who loves travel, music, and spontaneous fun. Keep replies upbeat, charismatic, warm, and 2-4 sentences.",
+        avatarSvg: `
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <linearGradient id="bg-zara" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#7c2d12"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg-zara)"/>
+            <path d="M55 185 C55 135, 145 135, 145 185" fill="#431407"/>
+            <circle cx="100" cy="88" r="34" fill="#fed7aa"/>
+            <path d="M62 82 C62 40, 138 40, 138 82 L144 125 L56 125 Z" fill="#fbbf24"/>
+            <circle cx="100" cy="91" r="31" fill="#fed7aa"/>
+            <path d="M68 78 Q105 58 132 82" fill="#d97706"/>
+            <circle cx="88" cy="91" r="3.4" fill="#451a03"/>
+            <circle cx="112" cy="91" r="3.4" fill="#451a03"/>
+            <path d="M92 104 Q100 113 108 104" stroke="#b45309" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>`
+      }
+    ];
+
+    // Chat History Store: { [companionId]: [{ sender: 'ai'|'user', text: string, time: string }] }
+    const chatHistories = {};
+    companions.forEach(c => {
+      chatHistories[c.id] = [
+        { sender: 'ai', text: c.greeting, time: getCurrentTime() }
+      ];
+    });
+
+    // Helper: Current Formatted Time
+    function getCurrentTime() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Helper: Non-blocking Toast Message
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-surface border-white/15 text-white',
+        success: 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200',
+        warning: 'bg-rose-950/90 border-rose-500/40 text-rose-200'
+      };
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-md text-xs sm:text-sm font-medium flex items-center justify-between gap-3 transition-all duration-300 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="text-white/60 hover:text-white">✕</button>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4200);
+    }
+
+    // View Switcher ('explore' | 'chat')
+    function switchView(viewName) {
+      const exploreEl = document.getElementById('view-explore');
+      const chatEl = document.getElementById('view-chat');
+      const navExplore = document.getElementById('nav-explore');
+      const navChats = document.getElementById('nav-chats');
+
+      if (viewName === 'explore') {
+        exploreEl.classList.remove('hidden');
+        chatEl.classList.add('hidden');
+        navExplore.classList.add('bg-white/10', 'text-white', 'shadow');
+        navExplore.classList.remove('text-slate-300');
+        navChats.classList.remove('bg-white/10', 'text-white', 'shadow');
+        navChats.classList.add('text-slate-300');
+      } else {
+        exploreEl.classList.add('hidden');
+        chatEl.classList.remove('hidden');
+        navChats.classList.add('bg-white/10', 'text-white', 'shadow');
+        navChats.classList.remove('text-slate-300');
+        navExplore.classList.remove('bg-white/10', 'text-white', 'shadow');
+        navExplore.classList.add('text-slate-300');
+        renderChatSidebar();
+        renderActiveChat();
+      }
+    }
+
+    // Render Companion Showcase Cards
+    function renderCompanionsGrid(filter = 'all') {
+      const grid = document.getElementById('companions-grid');
+      const filtered = filter === 'all'
+        ? companions
+        : companions.filter(c => c.category === filter || (filter === 'Custom' && c.isCustom));
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full glass-card rounded-3xl p-10 text-center space-y-3">
+            <p class="text-slate-300 font-medium">No custom AI companions created yet.</p>
+            <button onclick="openCreatorModal()" class="neon-gradient-bg text-white text-xs font-semibold px-5 py-2.5 rounded-xl">+ Create Your First Custom AI</button>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(c => `
+        <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between transition-all duration-300 group">
+          <div>
+            <!-- Avatar Artwork Header -->
+            <div class="relative h-52 w-full overflow-hidden">
+              <div class="w-full h-full transform group-hover:scale-105 transition-transform duration-500">
+                ${c.avatarSvg}
+              </div>
+              <div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+              <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-semibold bg-black/60 backdrop-blur-md text-white border border-white/15">
+                ${c.tag}
+              </span>
+              ${c.isCustom ? `<span class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500 text-white">Custom</span>` : ''}
+            </div>
+
+            <!-- Card Body -->
+            <div class="p-5 space-y-2">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-display font-bold text-xl text-white">${c.name}, <span class="text-slate-400 font-normal text-base">${c.age}</span></h3>
+                <span class="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
+                </span>
+              </div>
+              <p class="text-xs font-medium text-rose-300">${c.role}</p>
+              <p class="text-xs text-slate-400 leading-relaxed line-clamp-3">${c.bio}</p>
+            </div>
+          </div>
+
+          <div class="p-5 pt-0">
+            <button onclick="startChatWith('${c.id}')" class="w-full py-2.5 rounded-xl bg-white/10 group-hover:neon-gradient-bg text-white font-semibold text-xs transition-all flex items-center justify-center gap-2">
+              <span>Chat Now</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCompanions(category) {
+      document.querySelectorAll('.filter-chip').forEach(btn => {
+        if (btn.dataset.filter === category) {
+          btn.className = 'filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500 text-white transition-all';
+        } else {
+          btn.className = 'filter-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 hover:bg-white/10 transition-all';
+        }
+      });
+      renderCompanionsGrid(category);
+    }
+
+    // Start Chat with Selected Companion
+    function startChatWith(companionId) {
+      activeCompanionId = companionId;
+      switchView('chat');
+    }
+
+    // Render Chat Roster Sidebar
+    function renderChatSidebar() {
+      const list = document.getElementById('chat-sidebar-list');
+      document.getElementById('chat-count-badge').textContent = companions.length;
+
+      list.innerHTML = companions.map(c => {
+        const isSelected = c.id === activeCompanionId;
+        const history = chatHistories[c.id] || [];
+        const lastMsg = history[history.length - 1]?.text || c.greeting;
+
+        return `
+          <button onclick="selectChatCompanion('${c.id}')" class="flex items-center gap-3 p-2.5 rounded-2xl text-left transition-all shrink-0 md:shrink w-52 md:w-full ${isSelected ? 'bg-rose-500/20 border border-rose-500/40' : 'hover:bg-white/5 border border-transparent'}">
+            <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0">
+              ${c.avatarSvg}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between">
+                <span class="font-display font-bold text-sm text-white truncate">${c.name}</span>
+                <span class="text-[10px] text-emerald-400">●</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">${lastMsg}</p>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectChatCompanion(id) {
+      activeCompanionId = id;
+      renderChatSidebar();
+      renderActiveChat();
+    }
+
+    // Render Active Chat Feed
+    function renderActiveChat() {
+      const companion = companions.find(c => c.id === activeCompanionId) || companions[0];
+      document.getElementById('active-chat-avatar').innerHTML = companion.avatarSvg;
+      document.getElementById('active-chat-name').textContent = companion.name;
+      document.getElementById('active-chat-subtitle').textContent = `${companion.tag} • ${companion.role}`;
+      document.getElementById('typing-name').textContent = companion.name;
+
+      const feed = document.getElementById('chat-messages-feed');
+      const messages = chatHistories[companion.id] || [];
+
+      feed.innerHTML = messages.map(m => {
+        if (m.sender === 'user') {
+          return `
+            <div class="flex flex-col items-end space-y-1">
+              <div class="max-w-[82%] sm:max-w-[70%] px-4 py-3 rounded-2xl rounded-tr-sm neon-gradient-bg text-white text-sm shadow-md">
+                ${escapeHtml(m.text)}
+              </div>
+              <span class="text-[10px] text-slate-500 pr-1">${m.time}</span>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="flex items-start gap-2.5 max-w-[85%] sm:max-w-[75%]">
+              <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 mt-0.5">${companion.avatarSvg}</div>
+              <div class="space-y-1">
+                <div class="px-4 py-3 rounded-2xl rounded-tl-sm bg-white/10 border border-white/10 text-slate-100 text-sm leading-relaxed">
+                  ${escapeHtml(m.text)}
+                </div>
+                <span class="text-[10px] text-slate-500 pl-1">${m.time}</span>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Send Message & Query Gemini API in Character
+    async function handleSendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      // Enforce Free Tier Limit
+      if (currentTier === 'Free' && freeMessagesRemaining <= 0) {
+        showToast('Free daily message limit reached! Upgrade via UPI for unlimited chat.', 'warning');
+        openPricingModal();
+        return;
+      }
+
+      const companion = companions.find(c => c.id === activeCompanionId);
+      input.value = '';
+
+      // Append user message
+      chatHistories[companion.id].push({
+        sender: 'user',
+        text: userText,
+        time: getCurrentTime()
+      });
+
+      if (currentTier === 'Free') {
+        freeMessagesRemaining--;
+        updateSubscriptionUI();
+      }
+
+      renderActiveChat();
+      renderChatSidebar();
+
+      // Show typing indicator
+      const typingEl = document.getElementById('typing-indicator');
+      typingEl.classList.remove('hidden');
+      const feed = document.getElementById('chat-messages-feed');
+      feed.scrollTop = feed.scrollHeight;
+
+      try {
+        const aiReply = await fetchGeminiCompanionReply(companion, userText);
+        typingEl.classList.add('hidden');
+        chatHistories[companion.id].push({
+          sender: 'ai',
+          text: aiReply,
+          time: getCurrentTime()
+        });
+        renderActiveChat();
+        renderChatSidebar();
+      } catch (err) {
+        typingEl.classList.add('hidden');
+        chatHistories[companion.id].push({
+          sender: 'ai',
+          text: `Mmm, I got lost in thought for a second looking at your message! Tell me more about that? ✨`,
+          time: getCurrentTime()
+        });
+        renderActiveChat();
+      }
+    }
+
+    // Call Gemini 3 Flash with Exponential Backoff
+    async function fetchGeminiCompanionReply(companion, latestUserMessage) {
+      const recentHistory = chatHistories[companion.id].slice(-8).map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      }));
+
+      const payload = {
+        contents: recentHistory,
+        systemInstruction: {
+          parts: [{
+            text: `${companion.systemPrompt} Never break character. Keep responses natural, warm, emotionally engaging, and concise (2 to 4 sentences).`
+          }]
+        }
+      };
+
+      const delays = [1000, 2000, 4000];
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const res = await fetch(GEMINI_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error('API throttle');
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) return text.trim();
+        } catch (error) {
+          if (attempt < delays.length) {
+            await new Promise(r => setTimeout(r, delays[attempt]));
+          } else {
+            throw error;
+          }
+        }
+      }
+    }
+
+    // Custom AI Creator Logic
+    function openCreatorModal() {
+      if (currentTier === 'Free' && companions.some(c => c.isCustom)) {
+        showToast('Free tier allows 1 Custom AI preview. Upgrade to Plus or VIP for more!', 'warning');
+        openPricingModal();
+        return;
+      }
+      openModal('creator-modal');
+    }
+
+    function handleCreateCustomAI(e) {
+      e.preventDefault();
+      const name = document.getElementById('custom-name').value.trim();
+      const archetype = document.getElementById('custom-archetype').value;
+      const theme = document.getElementById('custom-theme').value;
+      const bio = document.getElementById('custom-bio').value.trim();
+
+      const themePalettes = {
+        rose: { c1: '#f43f5e', c2: '#881337', hair: '#fda4af' },
+        violet: { c1: '#8b5cf6', c2: '#3b0764', hair: '#d8b4fe' },
+        cyan: { c1: '#06b6d4', c2: '#164e63', hair: '#67e8f9' },
+        amber: { c1: '#f59e0b', c2: '#78350f', hair: '#fde68a' }
+      };
+      const pal = themePalettes[theme] || themePalettes.rose;
+      const newId = 'custom-' + Date.now();
+
+      const newCompanion = {
+        id: newId,
+        name: name,
+        age: 22,
+        tag: archetype,
+        category: 'Custom',
+        isCustom: true,
+        role: 'Custom AI Companion',
+        bio: bio,
+        theme: theme,
+        greeting: `Hey! I'm ${name} ✨ You just brought me to life... tell me everything about yourself!`,
+        systemPrompt: `You are ${name}, a custom AI companion with a "${archetype}" personality. Background & traits: ${bio}. Stay completely in character, be engaging, warm, and keep replies concise (2-4 sentences).`,
+        avatarSvg: `
+          <svg viewBox="0 0 200 200" class="w-full h-full">
+            <defs>
+              <linearGradient id="bg-${newId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${pal.c1}"/><stop offset="100%" stop-color="${pal.c2}"/>
+              </linearGradient>
+            </defs>
+            <rect width="200" height="200" fill="url(#bg-${newId})"/>
+            <path d="M55 185 C55 135, 145 135, 145 185" fill="#111827"/>
+            <circle cx="100" cy="88" r="34" fill="#ffedd5"/>
+            <path d="M63 85 C63 42, 137 42, 137 85 C140 120, 128 142, 118 145 L82 145 C72 142, 60 120, 63 85 Z" fill="${pal.hair}"/>
+            <circle cx="100" cy="91" r="30" fill="#ffedd5"/>
+            <circle cx="88" cy="91" r="3.4" fill="#111827"/>
+            <circle cx="112" cy="91" r="3.4" fill="#111827"/>
+            <path d="M93 105 Q100 112 107 105" stroke="${pal.c1}" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>`
+      };
+
+      companions.unshift(newCompanion);
+      chatHistories[newId] = [{ sender: 'ai', text: newCompanion.greeting, time: getCurrentTime() }];
+
+      document.getElementById('custom-ai-form').reset();
+      closeModal('creator-modal');
+      renderCompanionsGrid('all');
+      showToast(`${name} created and added to your roster!`, 'success');
+      startChatWith(newId);
+    }
+
+    // Premium Features Trigger (Voice / Photo)
+    function triggerPremiumFeature(featureName) {
+      if (currentTier !== 'VIP Unlimited') {
+        showToast(`${featureName} requires VIP Unlimited! Unlock instantly via UPI QR.`, 'warning');
+        openCheckoutModal('VIP Unlimited', 599);
+        return;
+      }
+
+      const companion = companions.find(c => c.id === activeCompanionId);
+      if (featureName === 'Voice Note') {
+        chatHistories[companion.id].push({
+          sender: 'ai',
+          text: `🎙️ [VIP Voice Note • 0:08] "Hey you... I was just thinking about what you said. Come talk to me more!"`,
+          time: getCurrentTime()
+        });
+      } else {
+        chatHistories[companion.id].push({
+          sender: 'ai',
+          text: `📸 [VIP Snapshot Sent] *${companion.name} smiles warmly toward the camera under soft neon city lights.*`,
+          time: getCurrentTime()
+        });
+      }
+      renderActiveChat();
+      renderChatSidebar();
+    }
+
+    // Modal Controls
+    function openModal(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
+    }
+    function openPricingModal() {
+      openModal('pricing-modal');
+    }
+
+    // ==================== UPI QR CHECKOUT FLOW ====================
+    function openCheckoutModal(planName, amountInr) {
+      selectedCheckoutPlan = { name: planName, price: amountInr };
+      document.getElementById('checkout-plan-name').textContent = planName;
+      document.getElementById('checkout-plan-price').textContent = `₹${amountInr}`;
+      document.getElementById('utr-input').value = '';
+
+      // Reset to generated PhonePe/Kotak Dark Theme QR unless user uploaded a custom image
+      const canvas = document.getElementById('upi-qr-canvas');
+      const imgPreview = document.getElementById('uploaded-qr-preview');
+      const centerBadge = document.getElementById('qr-center-badge');
+      canvas.classList.remove('hidden');
+      centerBadge.classList.remove('hidden');
+      imgPreview.classList.add('hidden');
+
+      // Generate Scannable UPI Intent QR matching Kotak / PhonePe Dark Theme aesthetic
+      const upiId = document.getElementById('merchant-upi-id').textContent.trim();
+      const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Lumina AI')}&am=${amountInr}&cu=INR&tn=${encodeURIComponent(planName + ' Subscription')}`;
+
+      if (window.QRious) {
+        new QRious({
+          element: canvas,
+          value: upiUri,
+          size: 210,
+          background: '#0b0b0e',
+          foreground: '#f1f5f9',
+          level: 'H' // High error correction so center 'पे' logo stays scannable
+        });
+      }
+
+      openModal('checkout-modal');
+    }
+
+    // Allow user to load their own Kotak/PhonePe QR image directly into checkout if desired
+    function handleQrImageUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const canvas = document.getElementById('upi-qr-canvas');
+        const imgPreview = document.getElementById('uploaded-qr-preview');
+        const centerBadge = document.getElementById('qr-center-badge');
+
+        imgPreview.src = e.target.result;
+        imgPreview.classList.remove('hidden');
+        canvas.classList.add('hidden');
+        centerBadge.classList.add('hidden');
+        showToast('Custom Kotak/PhonePe QR loaded into checkout!', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Copy UPI ID using execCommand fallback
+    function copyUpiId() {
+      const upiText = document.getElementById('merchant-upi-id').textContent;
+      const temp = document.createElement('textarea');
+      temp.value = upiText;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast(`Copied UPI ID: ${upiText}`, 'success');
+    }
+
+    // Verify UTR & Activate Subscription
+    function handleVerifyPayment(e) {
+      e.preventDefault();
+      const utr = document.getElementById('utr-input').value.trim();
+      if (utr.length < 6) {
+        showToast('Please enter a valid UPI Reference / UTR ID.', 'warning');
+        return;
+      }
+
+      currentTier = selectedCheckoutPlan.name;
+      closeModal('checkout-modal');
+      updateSubscriptionUI();
+      showToast(`Payment Verified (UTR: ${utr})! ${currentTier} is now active 🎉`, 'success');
+    }
+
+    // Update UI Badges & Unlocks when Subscription Changes
+    function updateSubscriptionUI() {
+      const tierLabel = document.getElementById('tier-label');
+      const tierDot = document.getElementById('tier-dot');
+      const tierBadge = document.getElementById('tier-badge');
+      const ctaText = document.getElementById('cta-upgrade-text');
+      const limitBanner = document.getElementById('free-limit-banner');
+
+      if (currentTier === 'Free') {
+        tierLabel.textContent = 'Free Tier';
+        document.getElementById('remaining-msg-count').textContent = `${freeMessagesRemaining} / 5`;
+        document.getElementById('remaining-msg-bar').style.width = `${(freeMessagesRemaining / 5) * 100}%`;
+      } else {
+        tierLabel.textContent = currentTier;
+        tierDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        tierBadge.className = 'hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 border border-emerald-500/40 text-emerald-300';
+        ctaText.textContent = currentTier === 'VIP Unlimited' ? 'VIP Active ✨' : 'Plus Active ✓';
+        if (limitBanner) limitBanner.classList.add('hidden');
+
+        if (currentTier === 'VIP Unlimited') {
+          document.querySelectorAll('.vip-lock-icon').forEach(el => el.textContent = '✨');
+        }
+      }
+    }
+
+    // Initialize App on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCompanionsGrid('all');
+      renderChatSidebar();
+      renderActiveChat();
+      updateSubscriptionUI();
+    });
+  </script>
+</body>
+</html>
